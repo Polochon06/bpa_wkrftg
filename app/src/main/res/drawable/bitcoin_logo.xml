@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Cercle doré principal avec gradient -->
+    <item>
+        <shape android:shape="oval">
+            <gradient
+                android:startColor="#F7931A"
+                android:centerColor="#FFB94E"
+                android:endColor="#F7931A"
+                android:angle="135"
+                android:type="linear" />
+            <size
+                android:width="48dp"
+                android:height="48dp" />
+        </shape>
+    </item>
+
+    <!-- Bordure brillante -->
+    <item
+        android:top="2dp"
+        android:bottom="2dp"
+        android:left="2dp"
+        android:right="2dp">
+        <shape android:shape="oval">
+            <gradient
+                android:startColor="#C87416"
+                android:centerColor="#E69236"
+                android:endColor="#C87416"
+                android:angle="45"
+                android:type="linear" />
+        </shape>
+    </item>
+
+    <!-- Cercle intérieur orange foncé -->
+    <item
+        android:top="6dp"
+        android:bottom="6dp"
+        android:left="6dp"
+        android:right="6dp">
+        <shape android:shape="oval">
+            <solid android:color="#E89332" />
+        </shape>
+    </item>
+</layer-list>

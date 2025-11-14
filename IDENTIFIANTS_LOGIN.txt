@@ -1,0 +1,15 @@
+========================================
+  IDENTIFIANTS DE CONNEXION - APP RFTG
+========================================
+
+Pour te connecter à l'application :
+
+📧 Nom d'utilisateur : polo
+🔑 Mot de passe : bpa
+
+========================================
+
+Ces identifiants sont configurés dans le backend
+(AuthController avec utilisateur codé en dur)
+
+Endpoint utilisé : http://10.0.2.2:8180/api/auth/login
