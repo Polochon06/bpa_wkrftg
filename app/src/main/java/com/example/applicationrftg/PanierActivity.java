@@ -211,34 +211,39 @@ public class PanierActivity extends AppCompatActivity {
                 btnSupprimer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // Supprimer de la BDD
-                        HashMap<String, String> filmASupprimer = panier.get(position);
-                        supprimerFilm(filmASupprimer);
+                        // Récupérer l'élément actuel au moment du clic
+                        @SuppressWarnings("unchecked")
+                        HashMap<String, String> filmASupprimer = (HashMap<String, String>) getItem(position);
 
-                        // Supprimer de la liste
-                        panier.remove(position);
+                        if (filmASupprimer != null) {
+                            // Supprimer de la BDD
+                            supprimerFilm(filmASupprimer);
 
-                        // Rafraîchir l'affichage
-                        notifyDataSetChanged();
+                            // Supprimer de la liste
+                            panier.remove(filmASupprimer);
 
-                        // Recalculer le total
-                        double nouveauTotal = 0.0;
-                        for (HashMap<String, String> ligne : panier) {
-                            try {
-                                nouveauTotal += Double.parseDouble(ligne.get("rentalRate"));
-                            } catch (Exception ignored) { }
+                            // Rafraîchir l'affichage
+                            notifyDataSetChanged();
+
+                            // Recalculer le total
+                            double nouveauTotal = 0.0;
+                            for (HashMap<String, String> ligne : panier) {
+                                try {
+                                    nouveauTotal += Double.parseDouble(ligne.get("rentalRate"));
+                                } catch (Exception ignored) { }
+                            }
+                            txtTotal.setText("Total : " + nouveauTotal + " €");
+
+                            // Si panier vide
+                            if (panier.isEmpty()) {
+                                txtMessagePanier.setText("Votre panier est vide");
+                                txtTotal.setText("Total : 0.0 €");
+                                listViewPanier.setAdapter(null);
+                                btnCommander.setEnabled(false);
+                            }
+
+                            Toast.makeText(PanierActivity.this, "Film supprimé ❌", Toast.LENGTH_SHORT).show();
                         }
-                        txtTotal.setText("Total : " + nouveauTotal + " €");
-
-                        // Si panier vide
-                        if (panier.isEmpty()) {
-                            txtMessagePanier.setText("Votre panier est vide");
-                            txtTotal.setText("Total : 0.0 €");
-                            listViewPanier.setAdapter(null);
-                            btnCommander.setEnabled(false);
-                        }
-
-                        Toast.makeText(PanierActivity.this, "Film supprimé ❌", Toast.LENGTH_SHORT).show();
                     }
                 });
 
