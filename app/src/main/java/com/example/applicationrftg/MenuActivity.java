@@ -12,7 +12,7 @@ public class MenuActivity extends AppCompatActivity {
 
     private CardView btnVoirFilms, btnVoirPanier, btnDeconnexion;
     private TextView txtPanierCount;
-    private String token;
+    private int customerId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,9 +21,9 @@ public class MenuActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_menu);
 
-        // Récupérer le token depuis l'intent
-        token = getIntent().getStringExtra("token");
-        Log.d("mydebug", ">>> MenuActivity - Token reçu: " + (token != null ? "OK" : "NULL"));
+        // Récupérer le customerId depuis l'intent
+        customerId = getIntent().getIntExtra("customerId", -1);
+        Log.d("mydebug", ">>> MenuActivity - CustomerId reçu: " + customerId);
 
         btnVoirFilms = findViewById(R.id.btnVoirFilms);
         btnVoirPanier = findViewById(R.id.btnVoirPanier);
@@ -37,7 +37,7 @@ public class MenuActivity extends AppCompatActivity {
         btnVoirFilms.setOnClickListener(v -> {
             Log.d("mydebug", ">>> MenuActivity - Clic sur btnVoirFilms");
             Intent intent = new Intent(MenuActivity.this, ListefilmsActivity.class);
-            intent.putExtra("token", token);
+            intent.putExtra("customerId", customerId);
             startActivity(intent);
         });
 
