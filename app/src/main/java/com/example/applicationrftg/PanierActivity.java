@@ -19,7 +19,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PanierActivity extends AppCompatActivity {
+public class PanierActivity extends AppCompatActivity implements ValidatePanierTask.Listener {
+
+    private static int customerId = -1; // ID du client connecté
+
+    // Méthode pour définir le customerId (appelée après login)
+    public static void setCustomerId(int id) {
+        customerId = id;
+    }
 
     public static ArrayList<HashMap<String, String>> panier = new ArrayList<>();
     private static PanierDBHelper dbHelper;
@@ -269,22 +276,64 @@ public class PanierActivity extends AppCompatActivity {
         btnCommander.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Afficher un message de confirmation
-                Toast.makeText(PanierActivity.this,
-                    "Commande validée ! Total : " + totalFinal + " €",
-                    Toast.LENGTH_LONG).show();
+                // Vérifier que le customerId est défini
+                if (customerId == -1) {
+                    Toast.makeText(PanierActivity.this,
+                        "Erreur : vous devez être connecté pour commander",
+                        Toast.LENGTH_LONG).show();
+                    return;
+                }
 
-                // Vider le panier après la commande (mémoire + BDD)
-                panier.clear();
-                dbHelper.viderPanier();
-
-                // Rafraîchir l'affichage
-                txtMessagePanier.setText("Votre panier est vide");
-                txtTotal.setText("Total : 0.0 €");
-                listViewPanier.setAdapter(null);
+                // Désactiver le bouton pendant l'envoi
                 btnCommander.setEnabled(false);
+                btnCommander.setText("Envoi en cours...");
+
+                // Récupérer les filmIds du panier
+                java.util.List<Integer> filmIds = new java.util.ArrayList<>();
+                for (HashMap<String, String> film : panier) {
+                    try {
+                        int filmId = Integer.parseInt(film.get("filmId"));
+                        filmIds.add(filmId);
+                    } catch (Exception e) {
+                        // Ignorer les filmId invalides
+                    }
+                }
+
+                // Appeler l'API pour valider le panier
+                new ValidatePanierTask(PanierActivity.this, customerId, filmIds).execute();
             }
         });
+    }
+
+    // Callback quand la validation réussit
+    @Override
+    public void onValidationSuccess(int rentalsCreated) {
+        Toast.makeText(this,
+            "Commande validée ! " + rentalsCreated + " location(s) créée(s)",
+            Toast.LENGTH_LONG).show();
+
+        // Vider le panier après la commande (mémoire + BDD)
+        panier.clear();
+        dbHelper.viderPanier();
+
+        // Rafraîchir l'affichage
+        txtMessagePanier.setText("Votre panier est vide");
+        txtTotal.setText("Total : 0.0 €");
+        listViewPanier.setAdapter(null);
+        btnCommander.setText("Commander");
+        btnCommander.setEnabled(false);
+    }
+
+    // Callback quand la validation échoue
+    @Override
+    public void onValidationError(String error) {
+        Toast.makeText(this,
+            "Erreur : " + error,
+            Toast.LENGTH_LONG).show();
+
+        // Réactiver le bouton
+        btnCommander.setText("Commander");
+        btnCommander.setEnabled(true);
     }
 }
 

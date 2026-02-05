@@ -5,9 +5,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,17 +23,22 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
- * Activity pour afficher la liste des films
- * Utilise Gson selon le cours du 13/11/2025 (page 15)
+ * Activity pour afficher la liste des films avec filtrage par catégorie
  */
-public class ListefilmsActivity extends AppCompatActivity implements ListefilmsTask.Listener {
+public class ListefilmsActivity extends AppCompatActivity implements ListefilmsTask.Listener, CategoriesTask.Listener {
 
     private ListView listView;
     private TextView msg;
     private ProgressBar progressBar;
-    private String token;
+    private Spinner spinnerCategory;
+    private Button btnFilter;
+    private int customerId;
+
+    private ArrayList<HashMap<String, Object>> categories = new ArrayList<>();
+    private Integer selectedCategoryId = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,37 +50,124 @@ public class ListefilmsActivity extends AppCompatActivity implements ListefilmsT
         listView = findViewById(R.id.listViewFilms);
         msg = findViewById(R.id.txtMessage);
         progressBar = findViewById(R.id.progressBar);
+        spinnerCategory = findViewById(R.id.spinnerCategory);
+        btnFilter = findViewById(R.id.btnFilter);
 
-        token = getIntent().getStringExtra("token");
-        Log.d("mydebug", ">>> Token reçu: " + (token != null ? token.substring(0, 20) + "..." : "NULL"));
+        customerId = getIntent().getIntExtra("customerId", -1);
+        Log.d("mydebug", ">>> CustomerId reçu: " + customerId);
 
-        // Appel du service REST via AsyncTask (modèle du cours)
-        URL urlAAppeler = null;
+        // Charger les catégories
+        chargerCategories();
+
+        // Charger tous les films au départ
+        chargerFilms(null);
+
+        // Listener du bouton Filtrer
+        btnFilter.setOnClickListener(v -> {
+            int position = spinnerCategory.getSelectedItemPosition();
+
+            if (position == 0) {
+                // "Toutes les catégories" sélectionné
+                selectedCategoryId = null;
+            } else {
+                // Récupérer l'ID de la catégorie sélectionnée
+                HashMap<String, Object> selectedCategory = categories.get(position - 1);
+                selectedCategoryId = ((Double) selectedCategory.get("categoryId")).intValue();
+            }
+
+            // Recharger les films avec le filtre
+            chargerFilms(selectedCategoryId);
+        });
+    }
+
+    /**
+     * Charge les catégories depuis le serveur
+     */
+    private void chargerCategories() {
         try {
-            // 10.0.2.2 = adresse spéciale pour l'émulateur (équivalent de localhost)
-            // Limiter à 20 films pour tester
-            urlAAppeler = new URL("http://10.0.2.2:8180/films?limit=20");
-            Log.d("mydebug", ">>> URL créée: " + urlAAppeler.toString());
-            Log.d("mydebug", ">>> Lancement de ListefilmsTask...");
-            new ListefilmsTask(token, this).execute(urlAAppeler);
-            Log.d("mydebug", ">>> ListefilmsTask lancée");
-        } catch (MalformedURLException mue) {
-            Log.d("mydebug", ">>> MalformedURLException: " + mue.toString());
-            msg.setText("Erreur : URL invalide");
-            msg.setVisibility(View.VISIBLE);
+            URL urlCategories = new URL("http://192.168.30.124:8180/categories");
+            new CategoriesTask(this).execute(urlCategories);
+        } catch (MalformedURLException e) {
+            Log.d("mydebug", ">>> Erreur URL catégories: " + e.toString());
         }
     }
 
     /**
-     * Méthode appelée automatiquement par ListefilmsTask après l'appel REST
-     * (Modèle du cours du 13/11/2025)
+     * Charge les films depuis le serveur
+     * @param categoryId ID de la catégorie (null pour tous les films)
+     */
+    private void chargerFilms(Integer categoryId) {
+        progressBar.setVisibility(View.VISIBLE);
+        msg.setVisibility(View.GONE);
+
+        try {
+            String urlString;
+            if (categoryId != null) {
+                urlString = "http://192.168.30.124:8180/films?categoryId=" + categoryId + "&limit=50";
+            } else {
+                urlString = "http://192.168.30.124:8180/films?limit=20";
+            }
+
+            URL urlFilms = new URL(urlString);
+            Log.d("mydebug", ">>> URL films: " + urlString);
+            new ListefilmsTask(null, this).execute(urlFilms);
+        } catch (MalformedURLException e) {
+            Log.d("mydebug", ">>> Erreur URL films: " + e.toString());
+            msg.setText("Erreur : URL invalide");
+            msg.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Callback quand les catégories sont chargées
+     */
+    @Override
+    public void onCategoriesLoaded(String resultatJson) {
+        Log.d("mydebug", ">>> Catégories reçues");
+
+        if (resultatJson == null || resultatJson.isEmpty()) {
+            Log.d("mydebug", ">>> Aucune catégorie reçue");
+            return;
+        }
+
+        try {
+            Gson gson = new Gson();
+            Type categoryListType = new TypeToken<ArrayList<HashMap<String, Object>>>(){}.getType();
+            categories = gson.fromJson(resultatJson, categoryListType);
+
+            // Créer la liste des noms de catégories pour le Spinner
+            List<String> categoryNames = new ArrayList<>();
+            categoryNames.add("Toutes les catégories"); // Option par défaut
+
+            for (HashMap<String, Object> category : categories) {
+                categoryNames.add(String.valueOf(category.get("name")));
+            }
+
+            // Adapter le Spinner
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                categoryNames
+            );
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinnerCategory.setAdapter(adapter);
+
+            Log.d("mydebug", ">>> " + categories.size() + " catégories chargées");
+
+        } catch (Exception e) {
+            Log.d("mydebug", ">>> Erreur conversion JSON catégories: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Callback quand les films sont chargés
      */
     @Override
     public void onTaskCompleted(String resultatJson) {
         progressBar.setVisibility(View.GONE);
 
-        Log.d("mydebug", ">>> onTaskCompleted - resultat reçu");
-        Log.d("mydebug", ">>> Contenu JSON: " + (resultatJson != null ? resultatJson : "NULL"));
+        Log.d("mydebug", ">>> Films reçus");
 
         if (resultatJson == null || resultatJson.isEmpty()) {
             msg.setText("Aucune donnée reçue du serveur");
@@ -80,32 +175,28 @@ public class ListefilmsActivity extends AppCompatActivity implements ListefilmsT
             return;
         }
 
-        // Conversion du JSON en ArrayList<HashMap> avec Gson (modèle du cours page 15)
-        ArrayList<HashMap<String, Object>> listeFilms = null;
         try {
-            listeFilms = convertirListeFilmsEnArrayList(resultatJson);
+            ArrayList<HashMap<String, Object>> listeFilms = convertirListeFilmsEnArrayList(resultatJson);
+
+            if (listeFilms == null || listeFilms.isEmpty()) {
+                msg.setText("Aucun film trouvé pour cette catégorie");
+                msg.setVisibility(View.VISIBLE);
+                listView.setAdapter(null);
+                return;
+            }
+
+            msg.setVisibility(View.GONE);
+            afficherListeFilms(listeFilms);
+
         } catch (Exception e) {
             Log.d("mydebug", ">>> ERREUR conversion JSON: " + e.getMessage());
             msg.setText("Erreur de conversion JSON: " + e.getMessage());
             msg.setVisibility(View.VISIBLE);
-            return;
         }
-
-        if (listeFilms == null || listeFilms.isEmpty()) {
-            msg.setText("Aucun film trouvé");
-            msg.setVisibility(View.VISIBLE);
-            return;
-        }
-
-        msg.setVisibility(View.GONE);
-
-        // Affichage dans la liste
-        afficherListeFilms(listeFilms);
     }
 
     /**
      * Conversion de la chaîne JSON en ArrayList avec Gson
-     * (Modèle du cours du 13/11/2025 - page 15)
      */
     private ArrayList<HashMap<String, Object>> convertirListeFilmsEnArrayList(String filmsJson) {
         Gson gson = new Gson();
@@ -113,14 +204,7 @@ public class ListefilmsActivity extends AppCompatActivity implements ListefilmsT
         Type filmListType = new TypeToken<ArrayList<HashMap<String, Object>>>(){}.getType();
         ArrayList<HashMap<String, Object>> filmArray = gson.fromJson(filmsJson, filmListType);
 
-        // Contrôle (debug)
-        Log.d("mydebug", ">>> Les films >>> DEBUT");
-        if (filmArray != null) {
-            for(HashMap<String, Object> film : filmArray) {
-                Log.d("mydebug", "Film: " + film.get("title") + " (" + film.get("releaseYear") + ")");
-            }
-        }
-        Log.d("mydebug", ">>> Les films >>> FIN");
+        Log.d("mydebug", ">>> " + (filmArray != null ? filmArray.size() : 0) + " films chargés");
 
         return filmArray;
     }

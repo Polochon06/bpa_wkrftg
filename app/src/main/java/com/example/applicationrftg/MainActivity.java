@@ -15,7 +15,7 @@ import com.google.android.material.textfield.TextInputEditText;
 public class MainActivity extends AppCompatActivity implements LoginTask.LoginTaskListener {
 
     private TextInputEditText editEmail, editPassword;
-    private MaterialButton btnConnexion;
+    private MaterialButton btnConnexion, btnSettings;
     private ProgressBar progressBar;
     private TextView txtMessage;
 
@@ -29,8 +29,12 @@ public class MainActivity extends AppCompatActivity implements LoginTask.LoginTa
         editEmail = findViewById(R.id.editEmail);
         editPassword = findViewById(R.id.editPassword);
         btnConnexion = findViewById(R.id.btnConnexion);
+        btnSettings = findViewById(R.id.btnSettings);
         progressBar = findViewById(R.id.progressBarLogin);
         txtMessage = findViewById(R.id.txtMessageLogin);
+
+        // Masquer le bouton paramètres
+        btnSettings.setVisibility(View.GONE);
 
         btnConnexion.setOnClickListener(v -> {
             String email = editEmail.getText().toString().trim();
@@ -49,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements LoginTask.LoginTa
             Log.d("mydebug", ">>> MainActivity - Tentative de connexion avec: " + email);
 
             // Lancer la tâche de connexion
-            LoginTask loginTask = new LoginTask(this);
+            LoginTask loginTask = new LoginTask(MainActivity.this, this);
             loginTask.execute(email, password);
         });
 
@@ -57,15 +61,18 @@ public class MainActivity extends AppCompatActivity implements LoginTask.LoginTa
     }
 
     @Override
-    public void onLoginSuccess(String token) {
-        Log.d("mydebug", ">>> MainActivity - Login réussi ! Token: " + token);
+    public void onLoginSuccess(int customerId) {
+        Log.d("mydebug", ">>> MainActivity - Login réussi ! CustomerId: " + customerId);
 
         progressBar.setVisibility(View.GONE);
         btnConnexion.setEnabled(true);
 
-        // Aller au menu principal avec le token
+        // Sauvegarder le customerId pour le panier
+        PanierActivity.setCustomerId(customerId);
+
+        // Aller au menu principal avec le customerId
         Intent intent = new Intent(MainActivity.this, MenuActivity.class);
-        intent.putExtra("token", token);
+        intent.putExtra("customerId", customerId);
         startActivity(intent);
         finish(); // Fermer l'écran de login
     }

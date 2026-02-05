@@ -1,5 +1,6 @@
 package com.example.applicationrftg;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -13,24 +14,27 @@ import java.net.URL;
 public class LoginTask extends AsyncTask<String, Void, String> {
 
     private LoginTaskListener listener;
+    private Context context;
 
     public interface LoginTaskListener {
-        void onLoginSuccess(String token);
+        void onLoginSuccess(int customerId);
         void onLoginError(String error);
     }
 
-    public LoginTask(LoginTaskListener listener) {
+    public LoginTask(Context context, LoginTaskListener listener) {
+        this.context = context;
         this.listener = listener;
     }
 
     @Override
     protected String doInBackground(String... params) {
-        String username = params[0];
+        String email = params[0];
         String password = params[1];
 
         try {
-            // URL de connexion bouchon (10.0.2.2 = localhost pour émulateur Android, port 8180)
-            URL url = new URL("http://10.0.2.2:8180/api/bouchon/login");
+            // URL de connexion (IP du PC pour téléphone réel)
+            URL url = new URL("http://192.168.30.124:8180/customers/verify");
+            Log.d("mydebug", ">>> LoginTask - URL: " + url.toString());
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
@@ -40,9 +44,9 @@ public class LoginTask extends AsyncTask<String, Void, String> {
             connection.setConnectTimeout(10000);
             connection.setReadTimeout(10000);
 
-            // Créer le JSON avec username et password (format AuthRequest du backend)
+            // Créer le JSON avec email et password (format LoginRequest du backend)
             JSONObject jsonBody = new JSONObject();
-            jsonBody.put("username", username);
+            jsonBody.put("email", email);
             jsonBody.put("password", password);
 
             // Envoyer le JSON
@@ -67,14 +71,17 @@ public class LoginTask extends AsyncTask<String, Void, String> {
 
                 Log.d("mydebug", ">>> LoginTask - Response: " + response.toString());
 
-                // Parser la réponse JSON pour extraire le token
+                // Parser la réponse JSON pour extraire le customerId
                 JSONObject jsonResponse = new JSONObject(response.toString());
-                String token = jsonResponse.getString("token");
+                int customerId = jsonResponse.getInt("customerId");
 
-                return "SUCCESS:" + token;
+                // Si customerId == -1, c'est un échec de connexion
+                if (customerId == -1) {
+                    return "ERROR:Email ou mot de passe incorrect";
+                }
 
-            } else if (responseCode == 401) {
-                return "ERROR:Email ou mot de passe incorrect";
+                return "SUCCESS:" + customerId;
+
             } else {
                 return "ERROR:Erreur serveur (code " + responseCode + ")";
             }
@@ -88,8 +95,9 @@ public class LoginTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         if (result.startsWith("SUCCESS:")) {
-            String token = result.substring(8); // Enlever "SUCCESS:"
-            listener.onLoginSuccess(token);
+            String customerIdStr = result.substring(8); // Enlever "SUCCESS:"
+            int customerId = Integer.parseInt(customerIdStr);
+            listener.onLoginSuccess(customerId);
         } else if (result.startsWith("ERROR:")) {
             String error = result.substring(6); // Enlever "ERROR:"
             listener.onLoginError(error);
