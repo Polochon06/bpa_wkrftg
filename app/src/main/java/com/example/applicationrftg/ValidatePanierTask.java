@@ -36,8 +36,8 @@ public class ValidatePanierTask extends AsyncTask<Void, Void, String> {
     @Override
     protected String doInBackground(Void... voids) {
         try {
-            // URL de l'endpoint (IP du PC pour téléphone réel)
-            URL url = new URL("http://192.168.30.124:8180/rentals/validate");
+            // URL de l'endpoint depuis DonneesPartagees
+            URL url = new URL(DonneesPartagees.getURLConnexion() + "/rentals/validate");
             Log.d("mydebug", ">>> ValidatePanierTask - URL: " + url.toString());
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();

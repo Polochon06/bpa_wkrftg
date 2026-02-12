@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.*;
 
 public class LoginTask extends AsyncTask<String, Void, String> {
 
@@ -32,8 +33,8 @@ public class LoginTask extends AsyncTask<String, Void, String> {
         String password = params[1];
 
         try {
-            // URL de connexion (IP du PC pour téléphone réel)
-            URL url = new URL("http://192.168.30.124:8180/customers/verify");
+            // URL de connexion depuis DonneesPartagees
+            URL url = new URL(DonneesPartagees.getURLConnexion() + "/customers/verify");
             Log.d("mydebug", ">>> LoginTask - URL: " + url.toString());
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -44,10 +45,14 @@ public class LoginTask extends AsyncTask<String, Void, String> {
             connection.setConnectTimeout(10000);
             connection.setReadTimeout(10000);
 
-            // Créer le JSON avec email et password (format LoginRequest du backend)
+            // Crypter le mot de passe en MD5
+            String passwordCrypte = encypterChaineMD5(password);
+            Log.d("mydebug", ">>> LoginTask - Password MD5: " + passwordCrypte);
+
+            // Créer le JSON avec email et password hashé en MD5
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("email", email);
-            jsonBody.put("password", password);
+            jsonBody.put("password", passwordCrypte);
 
             // Envoyer le JSON
             OutputStream os = connection.getOutputStream();
@@ -102,5 +107,29 @@ public class LoginTask extends AsyncTask<String, Void, String> {
             String error = result.substring(6); // Enlever "ERROR:"
             listener.onLoginError(error);
         }
+    }
+
+    // ENCRYPTAGE EN MD5
+    private String encypterChaineMD5(String chaine) {
+        byte[] chaineBytes = chaine.getBytes();
+        byte[] hash = null;
+        try {
+            hash = MessageDigest.getInstance("MD5").digest(chaineBytes);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        StringBuffer hashString = new StringBuffer();
+        for (int i=0; i<hash.length; ++i ) {
+            String hex = Integer.toHexString(hash[i]);
+            if (hex.length() == 1) {
+                hashString.append('0');
+                hashString.append(hex.charAt(hex.length()-1));
+            }
+            else {
+                hashString.append(hex.substring(hex.length()-2));
+            }
+        }
+        return hashString.toString();
     }
 }

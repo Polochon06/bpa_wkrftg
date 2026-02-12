@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">applicationrftg</string>
+
+    <!-- Liste d'URL de connexion au serveur -->
+    <string-array name="listeURLs">
+        <item>http://10.0.2.2:8180</item>
+        <item>http://192.168.30.124:8180</item>
+    </string-array>
 </resources>

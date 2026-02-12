@@ -42,7 +42,7 @@ public class Detailfilms extends AppCompatActivity {
             public void onClick(View v) {
                 // Créer un HashMap avec les infos du film
                 HashMap<String, String> filmPanier = new HashMap<>();
-                filmPanier.put("filmId", getIntent().getStringExtra("filmId"));
+                filmPanier.put("filmId", getIntent().getStringExtra("id"));
                 filmPanier.put("title", filmTitle);
                 filmPanier.put("rentalRate", filmPrice);
 

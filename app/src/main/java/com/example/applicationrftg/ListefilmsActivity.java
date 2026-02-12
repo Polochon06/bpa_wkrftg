@@ -85,7 +85,7 @@ public class ListefilmsActivity extends AppCompatActivity implements ListefilmsT
      */
     private void chargerCategories() {
         try {
-            URL urlCategories = new URL("http://192.168.30.124:8180/categories");
+            URL urlCategories = new URL(DonneesPartagees.getURLConnexion() + "/categories");
             new CategoriesTask(this).execute(urlCategories);
         } catch (MalformedURLException e) {
             Log.d("mydebug", ">>> Erreur URL catégories: " + e.toString());
@@ -102,10 +102,11 @@ public class ListefilmsActivity extends AppCompatActivity implements ListefilmsT
 
         try {
             String urlString;
+            String baseUrl = DonneesPartagees.getURLConnexion();
             if (categoryId != null) {
-                urlString = "http://192.168.30.124:8180/films?categoryId=" + categoryId + "&limit=50";
+                urlString = baseUrl + "/films?categoryId=" + categoryId + "&limit=50";
             } else {
-                urlString = "http://192.168.30.124:8180/films?limit=20";
+                urlString = baseUrl + "/films?limit=20";
             }
 
             URL urlFilms = new URL(urlString);
