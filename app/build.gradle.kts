@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.applicationrftg"
+    namespace = "com.example.applicationtftgbpa"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.applicationrftg"
+        applicationId = "com.example.applicationtftgbpa"
         minSdk = 23
         targetSdk = 34
         versionCode = 1

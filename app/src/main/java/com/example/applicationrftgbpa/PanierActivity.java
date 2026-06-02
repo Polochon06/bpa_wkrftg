@@ -1,4 +1,4 @@
-package com.example.applicationrftg;
+package com.example.applicationtftgbpa;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -34,12 +34,11 @@ public class PanierActivity extends AppCompatActivity implements ValidatePanierT
     // Classe interne pour gérer SQLite
     static class PanierDBHelper extends SQLiteOpenHelper {
         private static final String DATABASE_NAME = "panier.db";
-        private static final int DATABASE_VERSION = 1;
+        private static final int DATABASE_VERSION = 2;
         private static final String TABLE_PANIER = "panier";
         private static final String COL_ID = "id";
         private static final String COL_FILM_ID = "film_id";
         private static final String COL_TITLE = "title";
-        private static final String COL_RENTAL_RATE = "rental_rate";
 
         public PanierDBHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -50,8 +49,7 @@ public class PanierActivity extends AppCompatActivity implements ValidatePanierT
             String createTable = "CREATE TABLE " + TABLE_PANIER + " (" +
                     COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COL_FILM_ID + " TEXT, " +
-                    COL_TITLE + " TEXT, " +
-                    COL_RENTAL_RATE + " TEXT)";
+                    COL_TITLE + " TEXT)";
             db.execSQL(createTable);
         }
 
@@ -67,7 +65,6 @@ public class PanierActivity extends AppCompatActivity implements ValidatePanierT
             ContentValues values = new ContentValues();
             values.put(COL_FILM_ID, film.get("filmId"));
             values.put(COL_TITLE, film.get("title"));
-            values.put(COL_RENTAL_RATE, film.get("rentalRate"));
             db.insert(TABLE_PANIER, null, values);
             db.close();
         }
@@ -83,7 +80,6 @@ public class PanierActivity extends AppCompatActivity implements ValidatePanierT
                     HashMap<String, String> film = new HashMap<>();
                     film.put("filmId", cursor.getString(cursor.getColumnIndexOrThrow(COL_FILM_ID)));
                     film.put("title", cursor.getString(cursor.getColumnIndexOrThrow(COL_TITLE)));
-                    film.put("rentalRate", cursor.getString(cursor.getColumnIndexOrThrow(COL_RENTAL_RATE)));
                     liste.add(film);
                 } while (cursor.moveToNext());
             }
@@ -117,7 +113,7 @@ public class PanierActivity extends AppCompatActivity implements ValidatePanierT
     }
 
     private ListView listViewPanier;
-    private TextView txtTotal, txtMessagePanier;
+    private TextView txtMessagePanier;
     private Button btnCommander;
 
     // Méthode pour supprimer un film du panier
@@ -143,13 +139,11 @@ public class PanierActivity extends AppCompatActivity implements ValidatePanierT
         }
 
         listViewPanier = findViewById(R.id.listViewPanier);
-        txtTotal = findViewById(R.id.txtTotal);
         txtMessagePanier = findViewById(R.id.txtMessagePanier);
         btnCommander = findViewById(R.id.btnCommander);
 
         if (panier.isEmpty()) {
             txtMessagePanier.setText("Votre panier est vide");
-            txtTotal.setText("Total : 0.0 €");
             listViewPanier.setAdapter(null);
             btnCommander.setEnabled(false);
             return;
@@ -163,9 +157,9 @@ public class PanierActivity extends AppCompatActivity implements ValidatePanierT
         SimpleAdapter adapter = new SimpleAdapter(
                 this,
                 panier,
-                android.R.layout.simple_list_item_2,
-                new String[]{"title", "rentalRate"},
-                new int[]{android.R.id.text1, android.R.id.text2}
+                android.R.layout.simple_list_item_1,
+                new String[]{"title"},
+                new int[]{android.R.id.text1}
         ) {
             @Override
             public View getView(final int position, View convertView, ViewGroup parent) {
@@ -178,30 +172,16 @@ public class PanierActivity extends AppCompatActivity implements ValidatePanierT
                 container.setGravity(android.view.Gravity.CENTER_VERTICAL);
                 container.setPadding(16, 16, 16, 16);
 
-                // Layout vertical pour le titre et prix
-                android.widget.LinearLayout textContainer = new android.widget.LinearLayout(PanierActivity.this);
-                textContainer.setOrientation(android.widget.LinearLayout.VERTICAL);
-                android.widget.LinearLayout.LayoutParams textParams = new android.widget.LinearLayout.LayoutParams(
-                        0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
-                textContainer.setLayoutParams(textParams);
-
                 // Titre du film
                 TextView txtTitre = new TextView(PanierActivity.this);
+                android.widget.LinearLayout.LayoutParams textParams = new android.widget.LinearLayout.LayoutParams(
+                        0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
+                txtTitre.setLayoutParams(textParams);
                 txtTitre.setText(panier.get(position).get("title"));
                 txtTitre.setTextSize(16);
                 txtTitre.setTextColor(0xFFFFFFFF);
                 txtTitre.setMaxLines(2);
-                textContainer.addView(txtTitre);
-
-                // Prix du film
-                TextView txtPrix = new TextView(PanierActivity.this);
-                txtPrix.setText(panier.get(position).get("rentalRate") + " €");
-                txtPrix.setTextSize(14);
-                txtPrix.setTextColor(0xFF00D9A3);
-                txtPrix.setPadding(0, 4, 0, 0);
-                textContainer.addView(txtPrix);
-
-                container.addView(textContainer);
+                container.addView(txtTitre);
 
                 // Bouton supprimer
                 Button btnSupprimer = new Button(PanierActivity.this);
@@ -232,19 +212,9 @@ public class PanierActivity extends AppCompatActivity implements ValidatePanierT
                             // Rafraîchir l'affichage
                             notifyDataSetChanged();
 
-                            // Recalculer le total
-                            double nouveauTotal = 0.0;
-                            for (HashMap<String, String> ligne : panier) {
-                                try {
-                                    nouveauTotal += Double.parseDouble(ligne.get("rentalRate"));
-                                } catch (Exception ignored) { }
-                            }
-                            txtTotal.setText("Total : " + nouveauTotal + " €");
-
                             // Si panier vide
                             if (panier.isEmpty()) {
                                 txtMessagePanier.setText("Votre panier est vide");
-                                txtTotal.setText("Total : 0.0 €");
                                 listViewPanier.setAdapter(null);
                                 btnCommander.setEnabled(false);
                             }
@@ -261,16 +231,6 @@ public class PanierActivity extends AppCompatActivity implements ValidatePanierT
         };
 
         listViewPanier.setAdapter(adapter);
-
-        double total = 0.0;
-        for (HashMap<String, String> ligne : panier) {
-            try {
-                total += Double.parseDouble(ligne.get("rentalRate"));
-            } catch (Exception ignored) { }
-        }
-
-        final double totalFinal = total;
-        txtTotal.setText("Total : " + total + " €");
 
         // Gestion du clic sur le bouton Commander
         btnCommander.setOnClickListener(new View.OnClickListener() {
@@ -292,7 +252,7 @@ public class PanierActivity extends AppCompatActivity implements ValidatePanierT
                 java.util.List<Integer> filmIds = new java.util.ArrayList<>();
                 for (HashMap<String, String> film : panier) {
                     try {
-                        int filmId = Integer.parseInt(film.get("filmId"));
+                        int filmId = (int) Double.parseDouble(film.get("filmId"));
                         filmIds.add(filmId);
                     } catch (Exception e) {
                         // Ignorer les filmId invalides
@@ -318,7 +278,6 @@ public class PanierActivity extends AppCompatActivity implements ValidatePanierT
 
         // Rafraîchir l'affichage
         txtMessagePanier.setText("Votre panier est vide");
-        txtTotal.setText("Total : 0.0 €");
         listViewPanier.setAdapter(null);
         btnCommander.setText("Commander");
         btnCommander.setEnabled(false);

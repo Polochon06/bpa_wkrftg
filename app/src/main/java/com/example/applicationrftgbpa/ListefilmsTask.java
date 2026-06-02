@@ -1,11 +1,9 @@
-package com.example.applicationrftg;
+package com.example.applicationtftgbpa;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 

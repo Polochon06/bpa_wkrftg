@@ -1,4 +1,4 @@
-package com.example.applicationrftg;
+package com.example.bpa;
 
 import org.junit.Test;
 

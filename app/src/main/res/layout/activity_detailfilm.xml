@@ -5,166 +5,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background">
 
-    <!-- Header avec titre du film -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/headerCard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardBackgroundColor="#1E1E2E"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="4dp"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
-
-            <TextView
-                android:id="@+id/txtTitre"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Titre du Film"
-                android:textSize="26sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF" />
-
-            <TextView
-                android:id="@+id/txtAnnee"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2024"
-                android:textSize="14sp"
-                android:textColor="#AAAAAA"
-                android:layout_marginTop="4dp" />
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-    <!-- Carte avec note et prix -->
-    <LinearLayout
-        android:id="@+id/statsRow"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/headerCard">
-
-        <!-- Note -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            app:cardBackgroundColor="#1E1E2E"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp"
-                android:gravity="center">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="⭐ Note"
-                    android:textSize="12sp"
-                    android:textColor="#AAAAAA" />
-
-                <TextView
-                    android:id="@+id/txtNote"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="8.5/10"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:textColor="#FFD700"
-                    android:layout_marginTop="4dp" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Prix -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            app:cardBackgroundColor="#1E1E2E"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp"
-                android:gravity="center">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="💰 Prix"
-                    android:textSize="12sp"
-                    android:textColor="#AAAAAA" />
-
-                <TextView
-                    android:id="@+id/txtPrix"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="12.99 €"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:textColor="#00D9A3"
-                    android:layout_marginTop="4dp" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-    </LinearLayout>
-
-    <!-- Description -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/descriptionCard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        app:cardBackgroundColor="#1E1E2E"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
-        app:layout_constraintTop_toBottomOf="@id/statsRow">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="📖 Synopsis"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/txtDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Description du film..."
-                android:textSize="14sp"
-                android:textColor="#CCCCCC"
-                android:lineSpacingExtra="4dp" />
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-    <!-- Bouton Ajouter au panier -->
+    <!-- Bouton fixe en bas -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnAjouterPanier"
         android:layout_width="0dp"
@@ -180,5 +21,238 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Tout le contenu scrollable au-dessus du bouton -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btnAjouterPanier">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="8dp">
+
+            <!-- Header titre + année -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="#1E1E2E"
+                app:cardCornerRadius="0dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:id="@+id/txtTitre"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Titre du Film"
+                        android:textSize="26sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF" />
+
+                    <TextView
+                        android:id="@+id/txtAnnee"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2024"
+                        android:textSize="14sp"
+                        android:textColor="#AAAAAA"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Note -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="#1E1E2E"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⭐ Note"
+                        android:textSize="12sp"
+                        android:textColor="#AAAAAA" />
+
+                    <TextView
+                        android:id="@+id/txtNote"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="8.5/10"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFD700"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Synopsis -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="#1E1E2E"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📖 Synopsis"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/txtDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Description du film..."
+                        android:textSize="14sp"
+                        android:textColor="#CCCCCC"
+                        android:lineSpacingExtra="4dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Section Commentaires -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/commentsCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                app:cardBackgroundColor="#1E1E2E"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- Titre section -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="💬 Commentaires"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF" />
+
+                        <TextView
+                            android:id="@+id/txtNbComments"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textSize="12sp"
+                            android:textColor="#AAAAAA" />
+                    </LinearLayout>
+
+                    <!-- Indicateur de chargement -->
+                    <ProgressBar
+                        android:id="@+id/progressComments"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:indeterminateTint="#6C63FF"
+                        android:visibility="visible" />
+
+                    <!-- Container des commentaires (rempli dynamiquement) -->
+                    <LinearLayout
+                        android:id="@+id/commentsContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone" />
+
+                    <!-- Séparateur -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="12dp"
+                        android:background="#2A2A3E" />
+
+                    <!-- Saisie d'un nouveau commentaire -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="✏️ Laisser un avis"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="#AAAAAA"
+                        android:layout_marginBottom="8dp" />
+
+                    <EditText
+                        android:id="@+id/editCommentaire"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Votre commentaire..."
+                        android:minLines="2"
+                        android:maxLines="4"
+                        android:inputType="textMultiLine|textCapSentences"
+                        android:background="@android:color/transparent"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#666666"
+                        android:textSize="13sp"
+                        android:padding="10dp"
+                        android:gravity="top"
+                        style="@style/Widget.AppCompat.EditText" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnEnvoyerCommentaire"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="8dp"
+                        android:text="Envoyer"
+                        android:textSize="13sp"
+                        app:cornerRadius="10dp"
+                        app:backgroundTint="#6C63FF" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,6 +14,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "applicationrftg"
+rootProject.name = "applicationtftgbpa"
 include(":app")
  

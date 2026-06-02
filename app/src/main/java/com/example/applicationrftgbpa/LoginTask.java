@@ -1,4 +1,4 @@
-package com.example.applicationrftg;
+package com.example.applicationtftgbpa;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -76,7 +76,7 @@ public class LoginTask extends AsyncTask<String, Void, String> {
 
                 Log.d("mydebug", ">>> LoginTask - Response: " + response.toString());
 
-                // Parser la réponse JSON pour extraire le customerId
+                // Parser la réponse JSON pour extraire le customerId et le token
                 JSONObject jsonResponse = new JSONObject(response.toString());
                 int customerId = jsonResponse.getInt("customerId");
 
@@ -84,6 +84,10 @@ public class LoginTask extends AsyncTask<String, Void, String> {
                 if (customerId == -1) {
                     return "ERROR:Email ou mot de passe incorrect";
                 }
+
+                // Stocker le JWT pour les requêtes suivantes
+                String token = jsonResponse.optString("token", "");
+                DonneesPartagees.setJwt(token);
 
                 return "SUCCESS:" + customerId;
 

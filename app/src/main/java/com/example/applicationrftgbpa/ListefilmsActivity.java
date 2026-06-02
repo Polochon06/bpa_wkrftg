@@ -1,4 +1,4 @@
-package com.example.applicationrftg;
+package com.example.applicationtftgbpa;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -111,7 +111,8 @@ public class ListefilmsActivity extends AppCompatActivity implements ListefilmsT
 
             URL urlFilms = new URL(urlString);
             Log.d("mydebug", ">>> URL films: " + urlString);
-            new ListefilmsTask(null, this).execute(urlFilms);
+            String jwt = "eyJhbGciOiJIUzI1NiJ9.e30.jg2m4pLbAlZv1h5uPQ6fU38X23g65eXMX8q-SXuIPDg";
+            new ListefilmsTask(jwt, this).execute(urlFilms);
         } catch (MalformedURLException e) {
             Log.d("mydebug", ">>> Erreur URL films: " + e.toString());
             msg.setText("Erreur : URL invalide");
@@ -219,7 +220,9 @@ public class ListefilmsActivity extends AppCompatActivity implements ListefilmsT
 
         for (HashMap<String, Object> film : films) {
             HashMap<String, String> map = new HashMap<>();
-            map.put("id", String.valueOf(film.get("filmId")));
+            Object filmIdObj = film.get("filmId");
+            int filmIdInt = filmIdObj instanceof Double ? ((Double) filmIdObj).intValue() : Integer.parseInt(String.valueOf(filmIdObj));
+            map.put("id", String.valueOf(filmIdInt));
             map.put("title", String.valueOf(film.get("title")));
             // Afficher l'année + la note
             String yearAndRating = String.valueOf(film.get("releaseYear")) + " - Note: " + String.valueOf(film.get("rating"));
@@ -255,12 +258,13 @@ public class ListefilmsActivity extends AppCompatActivity implements ListefilmsT
             HashMap<String, Object> film = films.get(position);
 
             Intent intent = new Intent(ListefilmsActivity.this, Detailfilms.class);
-            intent.putExtra("id", String.valueOf(film.get("filmId")));
+            Object filmIdObj = film.get("filmId");
+            int fId = filmIdObj instanceof Double ? ((Double) filmIdObj).intValue() : Integer.parseInt(String.valueOf(filmIdObj));
+            intent.putExtra("id", String.valueOf(fId));
             intent.putExtra("title", String.valueOf(film.get("title")));
             intent.putExtra("description", String.valueOf(film.get("description")));
             intent.putExtra("releaseYear", String.valueOf(film.get("releaseYear")));
             intent.putExtra("rating", String.valueOf(film.get("rating")));
-            intent.putExtra("price", String.valueOf(film.get("rentalRate")));
             startActivity(intent);
         });
     }

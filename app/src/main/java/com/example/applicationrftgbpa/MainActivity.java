@@ -1,4 +1,4 @@
-package com.example.applicationrftg;
+package com.example.applicationtftgbpa;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -94,8 +94,9 @@ public class MainActivity extends AppCompatActivity
         progressBar.setVisibility(View.GONE);
         btnConnexion.setEnabled(true);
 
-        // Sauvegarder le customerId pour le panier
+        // Sauvegarder le customerId pour le panier et les commentaires
         PanierActivity.setCustomerId(customerId);
+        DonneesPartagees.setCustomerId(customerId);
 
         // Aller au menu principal avec le customerId
         Intent intent = new Intent(MainActivity.this, MenuActivity.class);

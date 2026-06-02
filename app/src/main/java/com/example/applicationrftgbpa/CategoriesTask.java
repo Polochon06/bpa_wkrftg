@@ -1,4 +1,4 @@
-package com.example.applicationrftg;
+package com.example.applicationtftgbpa;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -54,6 +54,9 @@ public class CategoriesTask extends AsyncTask<URL, Integer, String> {
             urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setRequestProperty("Accept", "application/json");
             urlConnection.setRequestProperty("User-Agent", System.getProperty("http.agent"));
+            // Token JWT pour l'authentification
+            String jwt = "eyJhbGciOiJIUzI1NiJ9.e30.jg2m4pLbAlZv1h5uPQ6fU38X23g65eXMX8q-SXuIPDg";
+            urlConnection.setRequestProperty("Authorization", "Bearer " + jwt);
             urlConnection.setConnectTimeout(10000);
             urlConnection.setReadTimeout(15000);
 
